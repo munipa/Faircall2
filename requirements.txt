@@ -1,0 +1,11 @@
+pybaseball
+pandas
+pyarrow
+scikit-learn
+xgboost
+torch
+fastapi
+uvicorn
+openai
+requests
+pytest
