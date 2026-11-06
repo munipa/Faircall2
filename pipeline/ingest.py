@@ -59,6 +59,24 @@ def clean(df: pd.DataFrame) -> pd.DataFrame:
     return df.drop_duplicates(subset=["game_pk", "at_bat_number", "pitch_number"])
 
 
+def fetch_with_retry(fetch, first: date, last: date, retries: int = 4):
+    """Call pybaseball's statcast, retrying dropped connections with backoff."""
+    import time
+
+    import requests
+
+    for attempt in range(retries):
+        try:
+            return fetch(start_dt=first.isoformat(), end_dt=last.isoformat(), verbose=False)
+        except requests.exceptions.RequestException as e:
+            if attempt == retries - 1:
+                raise
+            wait = 5 * 2 ** attempt
+            print(f"  connection error ({type(e).__name__}); retrying in {wait}s "
+                  f"[{attempt + 1}/{retries - 1}]")
+            time.sleep(wait)
+
+
 def ingest(season: int, start: date | None = None, end: date | None = None,
            force: bool = False) -> list[Path]:
     from pybaseball import statcast  # imported here so the module loads without it
@@ -71,11 +89,11 @@ def ingest(season: int, start: date | None = None, end: date | None = None,
             print(f"skip {out.name} (exists; use --force to re-download)")
             continue
         print(f"downloading {first} -> {last} ...")
-        raw = statcast(start_dt=first.isoformat(), end_dt=last.isoformat(), verbose=False)
-        if raw is None or raw.empty:
-            print(f"  no data for {first} -> {last}")
+        raw = fetch_with_retry(statcast, first, last)
+        df = clean(raw) if raw is not None and not raw.empty else None
+        if df is None or df.empty:
+            print(f"  no taken pitches for {first} -> {last}; not writing a file")
             continue
-        df = clean(raw)
         df.to_parquet(out, index=False)
         written.append(out)
         print(f"  saved {len(df):,} taken pitches -> {out.name}")
