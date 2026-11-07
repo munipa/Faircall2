@@ -47,8 +47,17 @@ python -m models.baseline --within 2025  # train Apr-Jul 2025, test Aug-Sep 2025
 Compares a zone rule, logistic regression and XGBoost. Results go to `reports/`
 (metrics table and calibration chart) and test-set predictions to `data/processed/`.
 
+## Umpire leaderboard
+Accuracy and strike-calling tendencies for each home-plate umpire in one season:
+```bash
+python -m pipeline.umpires --season 2025
+python -m analysis.umpire_stats --season 2025
+```
+Writes `reports/umpire_leaderboard_<season>.md`, `.csv` and `.png`. Expected strikes come
+from the XGBoost baseline cross-fitted within the season, and every metric has a 95% interval.
+
 ## Status
-Data pipeline and baseline model done. Bias metrics, leaderboard and app next.
+Data pipeline, baseline model and umpire leaderboard done. App next.
 
 ## AI tool usage
 Logged in [`docs/AI_DEV_LOG.md`](docs/AI_DEV_LOG.md).
