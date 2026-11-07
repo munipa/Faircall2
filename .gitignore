@@ -228,3 +228,7 @@ data/processed/*
 __pycache__/
 .venv/
 node_modules/
+
+# Regenerated baseline model outputs (the .md and .png reports are committed)
+reports/baseline_metrics*.csv
+reports/calibration*.csv
