@@ -38,8 +38,17 @@ pip install -r requirements.txt
 ```
 Put API keys in a `.env` file (git-ignored). Never commit them.
 
+## Baseline model
+Train on 2024 and test on 2025 (download both seasons with `pipeline.ingest` first):
+```bash
+python -m models.baseline              # train 2024, test 2025
+python -m models.baseline --within 2025  # train Apr-Jul 2025, test Aug-Sep 2025
+```
+Compares a zone rule, logistic regression and XGBoost. Results go to `reports/`
+(metrics table and calibration chart) and test-set predictions to `data/processed/`.
+
 ## Status
-Early development: project scaffold done, data pipeline next.
+Data pipeline and baseline model done. Bias metrics, leaderboard and app next.
 
 ## AI tool usage
 Logged in [`docs/AI_DEV_LOG.md`](docs/AI_DEV_LOG.md).
