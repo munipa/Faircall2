@@ -162,6 +162,7 @@ def run(seasons: list[int] | None = None, raw_dir: Path = RAW_DIR,
     reports_dir.mkdir(parents=True, exist_ok=True)
     report = _markdown(summary, persistence)
     (reports_dir / "trends.md").write_text(report)
+    summary.to_csv(reports_dir / "trends.csv", index=False)       # read by the app
     _plot(summary, reports_dir / "trends.png")
     print("\n" + report)
     return summary

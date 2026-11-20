@@ -73,8 +73,30 @@ python -m analysis.trends
 ```
 Writes `reports/trends.md` and `reports/trends.png`.
 
+## Bias breakdowns
+Where umpires lean beyond location: by count, previous pitch, home or away,
+handedness, pitch type, zone region, plus catcher framing:
+```bash
+python -m analysis.bias --season 2025 --catcher-names
+```
+
+## Challenge advisor
+How likely an ABS challenge is to be overturned, which misses teams left unchallenged,
+and a saved model for the app:
+```bash
+python -m analysis.challenge_advisor --season 2026
+```
+
+## App
+FastAPI backend plus a single web page (leaderboard, umpire histories, trends,
+catcher framing, challenge advisor). Run the analyses first, then:
+```bash
+uvicorn api.main:app --reload
+```
+and open http://127.0.0.1:8000
+
 ## Status
-Data for 2021-2026, baseline model, umpire leaderboards for every season, 2026 ABS challenges and multi-season trends done. Bias breakdowns and the app next.
+Data for 2021-2026, baseline model, umpire leaderboards for every season, 2026 ABS challenges and multi-season trends done. Bias breakdowns, challenge advisor and an app prototype done. LLM report cards, PyTorch comparison and deployment next.
 
 ## AI tool usage
 Logged in [`docs/AI_DEV_LOG.md`](docs/AI_DEV_LOG.md).
