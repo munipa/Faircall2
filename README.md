@@ -56,8 +56,25 @@ python -m analysis.umpire_stats --season 2025
 Writes `reports/umpire_leaderboard_<season>.md`, `.csv` and `.png`. Expected strikes come
 from the XGBoost baseline cross-fitted within the season, and every metric has a 95% interval.
 
+## 2026 ABS challenges
+Statcast records the call after an ABS challenge. This recovers the umpire's original call
+on every challenged pitch from the MLB Stats API game feed and reports how challenges went:
+```bash
+python -m pipeline.abs --season 2026
+python -m analysis.umpire_stats --season 2026   # uses the original calls
+```
+Writes `data/raw/abs_challenges_2026.parquet` and `reports/abs_challenges_2026.md`.
+
+## Trends across seasons
+League accuracy by season, Statcast's zone measurements, and whether umpire accuracy
+carries over from one season to the next:
+```bash
+python -m analysis.trends
+```
+Writes `reports/trends.md` and `reports/trends.png`.
+
 ## Status
-Data pipeline, baseline model and umpire leaderboard done. App next.
+Data for 2021-2026, baseline model, umpire leaderboards for every season, 2026 ABS challenges and multi-season trends done. Bias breakdowns and the app next.
 
 ## AI tool usage
 Logged in [`docs/AI_DEV_LOG.md`](docs/AI_DEV_LOG.md).

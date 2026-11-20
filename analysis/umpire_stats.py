@@ -36,7 +36,8 @@ import pandas as pd
 from models.baseline import (BALL_RADIUS_FT, PROCESSED_DIR, RAW_DIR, REPORTS_DIR, TARGET,
                              add_features, load_seasons, make_models)
 
-CLOSE_FT = 2 / 12          # "close" = within 2 inches of where the ball would touch the zone
+ABS_SEASON = 2026          # first season with ABS challenges
+CLOSE_FT = 2 / 12         # "close" = within 2 inches of where the ball would touch the zone
 Z = 1.96
 
 
@@ -194,8 +195,13 @@ def _markdown(board: pd.DataFrame, league: dict, season: int, min_pitches: int,
         f"Blocked balls {'excluded' if drop_blocked else 'included'}.",
         f"{league['umpires_rated']} of {league['umpires_total']} umpires have at least "
         f"{min_pitches:,} calls and are rated. {league['pitches_without_umpire']:,} pitches "
-        "had no umpire listed.", "",
-        "## League", "",
+        "had no umpire listed.",
+    ]
+    if league.get("overturned_restored") is not None:
+        lines.append(f"Umpires' original calls restored on {league['overturned_restored']:,} "
+                     "overturned ABS challenges.")
+    lines += [
+        "", "## League", "",
         f"- Accuracy against the measured zone: {_pct(acc)} "
         f"({(league['pitches'] - league['correct']) / league['games']:.1f} missed calls per game)",
         f"- Accuracy on close pitches (within 2 inches of the edge): {_pct(close_acc)}",
@@ -268,11 +274,22 @@ def run(season: int, *, min_pitches: int = 1000, folds: int = 5, model: str = "X
     pitches = add_features(load_seasons([season], raw_dir))
     if drop_blocked:
         pitches = pitches[pitches["description"] != "blocked_ball"]
+    restored = None
+    if season >= ABS_SEASON:
+        # From 2026 the recorded call is the one after any ABS challenge; restore the umpire's.
+        from pipeline.abs import apply_original_calls
+        path = raw_dir / f"abs_challenges_{season}.parquet"
+        if not path.exists():
+            raise SystemExit(f"{season} calls include ABS overturns, so umpires would look better "
+                             f"than they were; run: python -m pipeline.abs --season {season}")
+        pitches = apply_original_calls(pitches, pd.read_parquet(path))
+        restored = int(pitches["is_overturned"].sum())
     df = attach_umpires(pitches.reset_index(drop=True), load_umpires(season, raw_dir))
     print(f"{season}: {len(df):,} pitches in {df['game_pk'].nunique():,} games")
     df["p_strike"] = expected_strikes(df, folds=folds, model=model, seed=seed)
 
     board, league = leaderboard(df, min_pitches=min_pitches)
+    league["overturned_restored"] = restored
     reports_dir.mkdir(parents=True, exist_ok=True)
     processed_dir.mkdir(parents=True, exist_ok=True)
     board.to_csv(reports_dir / f"umpire_leaderboard_{season}.csv", index=False)
