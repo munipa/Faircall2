@@ -113,7 +113,34 @@
 const $ = (id) => document.getElementById(id);
 const pct = (x, d = 1) => x == null ? '–' : (100 * x).toFixed(d) + '%';
 const sgn = (x) => x == null ? '–' : (x >= 0 ? '+' : '') + x.toFixed(2);
-async function get(url) { const r = await fetch(url); if (!r.ok) throw new Error(url); return r.json(); }
+// Runs against the FastAPI server, or as a static site (GitHub Pages) reading data/*.json.
+const STATIC = window.FAIRCALL_STATIC === true;
+const cache = {};
+async function fetchJson(url) {
+  if (!(url in cache)) cache[url] = fetch(url).then((r) => { if (!r.ok) throw new Error(url); return r.json(); });
+  return cache[url];
+}
+function predictLocal(m, q) {
+  const x = { wrong_side_in: Math.max(-6, Math.min(6, +q.get('wrong_side_in'))), strike_call: +(q.get('call') === 'strike'),
+    two_strikes: +(q.get('strikes') === '2'), three_balls: +(q.get('balls') === '3'),
+    by_catcher: +(q.get('challenger') === 'catcher'), by_pitcher: +(q.get('challenger') === 'pitcher') };
+  const z = m.features.reduce((s, f) => s + m.coefficients[f] * x[f], m.intercept);
+  const p = 1 / (1 + Math.exp(-z));
+  return { probability: p, recommend: p >= 0.5, league_overturn_rate: m.overturn_rate };
+}
+async function get(url) {
+  if (!STATIC) { const r = await fetch(url); if (!r.ok) throw new Error(url); return r.json(); }
+  const [path, query] = url.split('?'); const parts = path.split('/').filter(Boolean);   // ['api', ...]
+  switch (parts[1]) {
+    case 'seasons': return fetchJson('data/seasons.json');
+    case 'leaderboard': return fetchJson(`data/leaderboard_${parts[2]}.json`);
+    case 'trends': return fetchJson('data/trends.json');
+    case 'framing': return fetchJson(`data/framing_${parts[2]}.json`);
+    case 'umpires': { const all = await fetchJson('data/umpires.json'); if (!all[parts[2]]) throw new Error('umpire'); return all[parts[2]]; }
+    case 'challenge': return predictLocal(await fetchJson('data/advisor.json'), new URLSearchParams(query));
+  }
+  throw new Error(url);
+}
 
 function cell(row, text, cls) { const td = document.createElement('td'); td.textContent = text; if (cls) td.className = cls; row.appendChild(td); }
 function header(table, cols, onSort) {
