@@ -53,6 +53,13 @@ def build(out_dir: Path = ROOT / "docs") -> dict:
             built[name] = False
             print(f"skipped {name} (its report hasn't been built yet)")
 
+    img = out_dir / "img"
+    img.mkdir(exist_ok=True)
+    figures = sorted(p for p in api.reports_dir().glob("*.png") if api.FIGURE.fullmatch(p.name))
+    for fig in figures:
+        (img / fig.name).write_bytes(fig.read_bytes())
+    built["figures"] = [f.name for f in figures]
+
     page = WEB.read_text()
     if MARKER not in page:
         raise SystemExit("web/index.html has changed; can't find where to switch on static mode")

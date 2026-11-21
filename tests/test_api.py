@@ -49,6 +49,13 @@ def test_trends_framing_and_advisor(client):
     assert client.get("/api/challenge/predict", params={"wrong_side_in": 1, "call": "x"}).status_code == 422
 
 
+def test_figures_are_served_only_by_name(client, tmp_path):
+    (tmp_path / "strike_zone_2025.png").write_bytes(b"\x89PNG fake")
+    assert client.get("/img/strike_zone_2025.png").status_code == 200
+    assert client.get("/img/trends.csv").status_code == 404
+    assert client.get("/img/abs_fixes_2026.png").status_code == 404
+
+
 def test_home_page_serves(client):
     page = client.get("/")
     assert page.status_code == 200 and "FairCall" in page.text

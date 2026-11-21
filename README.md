@@ -87,6 +87,14 @@ and a saved model for the app:
 python -m analysis.challenge_advisor --season 2026
 ```
 
+## Figures
+Presentation graphs in FairCall's colors: the real strike zone vs the rulebook (and by count),
+and which 2026 umpire misses ABS fixed:
+```bash
+python -m analysis.figures
+```
+Writes `reports/strike_zone_2025.png` and `reports/abs_fixes_2026.png`. The website shows both.
+
 ## App
 FastAPI backend plus a single web page (leaderboard, umpire histories, trends,
 catcher framing, challenge advisor). Run the analyses first, then:

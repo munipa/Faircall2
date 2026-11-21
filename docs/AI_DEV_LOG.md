@@ -8,3 +8,4 @@
 | 2026-11-20 | Claude | 2026 ABS challenge parser (pipeline/abs.py) and original-call restore in the leaderboard | Probed the real feed first; parser matched one game's box score 4/4; tested on synthetic feeds |
 | 2026-11-20 | Claude | Multi-season trends report (analysis/trends.py); ABS report now validates our zone against ABS rulings and counts misses fixed | Run on real 2021-2026 data; our zone matched ABS rulings on 99.9% of challenged pitches |
 | 2026-11-20 | Claude | Bias breakdowns (analysis/bias.py), challenge advisor (analysis/challenge_advisor.py), FastAPI + web app prototype (api/, web/) | 29 tests on synthetic data; advisor run on real 2026 challenges (AUC 0.999 in grouped CV); app checked in a browser with real leaderboards |
+| 2026-11-21 | Claude | Presentation figures (analysis/figures.py) and a Findings section on the website | Checked both figures by eye on real data; fixed a scatter that overstated the share of misses ABS fixed |

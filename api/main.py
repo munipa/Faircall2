@@ -117,6 +117,17 @@ def challenge_predict(
             "league_overturn_rate": model.get("overturn_rate")}
 
 
+FIGURE = re.compile(r"(strike_zone|abs_fixes)_\d{4}\.png")
+
+
+@app.get("/img/{name}")
+def figure(name: str):
+    path = reports_dir() / name
+    if not FIGURE.fullmatch(name) or not path.exists():
+        raise HTTPException(404, "figure not found; run: python -m analysis.figures")
+    return FileResponse(path, media_type="image/png")
+
+
 @app.get("/")
 def home():
     return FileResponse(WEB)

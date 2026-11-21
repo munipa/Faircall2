@@ -31,6 +31,9 @@
   .tall { max-height:560px; overflow-y:auto; padding-top:0; }
   .tall th { position:sticky; top:0; }
   .chart { max-width:560px; }
+  .fig { margin:16px 0 0; }
+  .fig img { width:100%; height:auto; display:block; border-radius:8px; }
+  .fig figcaption { margin-top:10px; }
   table { width:100%; border-collapse:collapse; font-size:15px; }
   th { background:var(--navy); color:var(--cream); text-align:left; padding:8px 10px; cursor:pointer; white-space:nowrap; }
   th.num, td.num { text-align:right; }
@@ -56,11 +59,24 @@
     <h1>FairCall</h1>
     <div class="tag">How accurate are umpires, where do they lean, and when is a challenge worth it?</div>
     <div class="stats" id="stats"></div>
-    <nav><a href="#leaderboard">Leaderboard</a><a href="#trends">Trends</a><a href="#framing">Catcher framing</a><a href="#advisor">Challenge advisor</a></nav>
+    <nav><a href="#findings">Findings</a><a href="#leaderboard">Leaderboard</a><a href="#trends">Trends</a><a href="#framing">Catcher framing</a><a href="#advisor">Challenge advisor</a></nav>
   </div>
 </header>
 
 <main class="wrap">
+  <section id="findings">
+    <div class="eyebrow">What we found</div>
+    <h2>Findings</h2>
+    <figure class="card fig">
+      <img src="img/strike_zone_2025.png" alt="Heatmap of where umpires call strikes in 2025, compared with the rulebook zone. The real zone is wider than the box with rounded corners, and it is bigger at a 3-0 count than at 0-2." loading="lazy" onerror="this.closest('figure').remove()">
+      <figcaption class="muted">Umpires' real zone has rounded corners and runs wider than the rulebook box (partly because a ball only has to touch the zone). It grows when the batter is ahead 3-0 and shrinks at 0-2.</figcaption>
+    </figure>
+    <figure class="card fig">
+      <img src="img/abs_fixes_2026.png" alt="Every 2026 umpire miss plotted on the zone, colored by whether an ABS challenge fixed it, with the share fixed by how far the pitch was from the edge." loading="lazy" onerror="this.closest('figure').remove()">
+      <figcaption class="muted">In 2026, ABS challenges fixed about a quarter of umpire misses. Bigger misses were more likely to be challenged, but most misses of every size still stood.</figcaption>
+    </figure>
+  </section>
+
   <section id="leaderboard">
     <div class="eyebrow">Umpires</div>
     <h2>Leaderboard</h2>
