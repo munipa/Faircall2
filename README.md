@@ -3,6 +3,24 @@
 Auditing the MLB strike zone with machine learning.
 CPE 595 · Applied Machine Learning · Akhil Munipalli, Hugh O'Donnell, Soham Panigrahi
 
+## Results
+
+**Data.** Taken pitches (called strikes and balls) from Statcast via pybaseball, with each game's home-plate umpire from the MLB Stats API. Seasons 2021–2026 are downloaded (2,218,983 taken pitches); the baseline models below use 2024 and 2025.
+
+**Held-out test: trained on 2024 (366,873 pitches), tested on 2025 (368,845 pitches).**
+
+| Model | AUC | Log loss | Accuracy |
+|---|---|---|---|
+| Zone rule (rulebook box) | 0.9215 | 0.2483 | 92.90% |
+| Logistic regression | 0.9831 | 0.1578 | 93.37% |
+| XGBoost | 0.9867 | 0.1403 | 93.95% |
+
+XGBoost's log loss is 43.5% lower than the rulebook zone rule's (0.1403 vs 0.2483).
+
+Within-season check (trained on April–July 2025, 247,397 pitches; tested on August–September 2025, 121,448 pitches): XGBoost AUC 0.9865, log loss 0.1382, 43.6% lower than the zone rule's 0.2451. Statcast's measured zone shifted between 2024 and 2025, so the within-season test gives better-calibrated probabilities.
+
+Sources: `reports/baseline_metrics.md` and `reports/baseline_metrics_within_2025.md`.
+
 ## What it does
 Umpires miss 10+ ball/strike calls per game, and the errors are skewed in predictable ways (two-strike counts, zone edges). FairCall:
 
